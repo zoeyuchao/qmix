@@ -4,6 +4,7 @@ from __future__ import print_function
 
 from smac.env.multiagentenv import MultiAgentEnv
 from smac.env.starcraft2.maps import get_map_params
+import time
 
 import atexit
 from operator import attrgetter
@@ -432,6 +433,7 @@ class StarCraft2Env(MultiAgentEnv):
         terminated = False
         reward = self.reward_battle()
         info = {"battle_won": False}
+        
 
         if game_end_code is not None:
             # Battle is over

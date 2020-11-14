@@ -31,16 +31,14 @@ class MLPLayer(nn.Module):
                 active_func = nn.Tanh()
                 init_ = lambda m: init(m, nn.init.xavier_uniform_, lambda x: nn.init.constant_(x, 0), gain = nn.init.calculate_gain('tanh'))
 
-        self.fc1 = nn.Sequential(init_(nn.Linear(input_dim, hidden_size)), active_func)
-        self.fc_h = nn.Sequential(init_(nn.Linear(hidden_size, hidden_size)), active_func)
+        self.fc1 = nn.Sequential(init_(nn.Linear(input_dim, hidden_size)), active_func, nn.LayerNorm(hidden_size))
+        self.fc_h = nn.Sequential(init_(nn.Linear(hidden_size, hidden_size)), active_func, nn.LayerNorm(hidden_size))
         self.fc2 = get_clones(self.fc_h, self._layer_N)
-        self.norm = nn.LayerNorm(hidden_size)
     
     def forward(self, x):
         x = self.fc1(x)
         for i in range(self._layer_N):
             x = self.fc2[i](x)
-        x = self.norm(x)
         return x
 
 class RNNAgent(nn.Module):
@@ -65,9 +63,9 @@ class RNNAgent(nn.Module):
                 else:
                     nn.init.xavier_uniform_(param)
         if self._use_orthogonal:
-            init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.constant_(x, 0),0.01)
+            init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.constant_(x, 0),1)
         else:
-            init_ = lambda m: init(m, nn.init.xavier_uniform_, lambda x: nn.init.constant_(x, 0),0.01)
+            init_ = lambda m: init(m, nn.init.xavier_uniform_, lambda x: nn.init.constant_(x, 0),1)
             
         self.norm = nn.LayerNorm(args.rnn_hidden_dim)
        
